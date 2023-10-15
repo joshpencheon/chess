@@ -15,3 +15,5 @@ Chess::Position.starting.render
 ```ruby
 Chess::Position.starting.render(perspective: :black)
 ```
+
+<img width="1182" alt="chess" src="https://github.com/joshpencheon/chess/assets/30904/a728e089-a2ad-47e2-b44f-67cf66dd8304">
