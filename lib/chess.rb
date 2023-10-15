@@ -10,38 +10,38 @@ module Chess
   class Position
     def self.starting
       new [
-        Rook.new(:white,   1, 'a'),
-        Knight.new(:white, 1, 'b'),
-        Bishop.new(:white, 1, 'c'),
-        Queen.new(:white,  1, 'd'),
-        King.new(:white,   1, 'e'),
-        Bishop.new(:white, 1, 'f'),
-        Knight.new(:white, 1, 'g'),
-        Rook.new(:white,   1, 'h'),
-        Pawn.new(:white,   2, 'a'),
-        Pawn.new(:white,   2, 'b'),
-        Pawn.new(:white,   2, 'c'),
-        Pawn.new(:white,   2, 'd'),
-        Pawn.new(:white,   2, 'e'),
-        Pawn.new(:white,   2, 'f'),
-        Pawn.new(:white,   2, 'g'),
-        Pawn.new(:white,   2, 'h'),
-        Pawn.new(:black,   7, 'a'),
-        Pawn.new(:black,   7, 'b'),
-        Pawn.new(:black,   7, 'c'),
-        Pawn.new(:black,   7, 'd'),
-        Pawn.new(:black,   7, 'e'),
-        Pawn.new(:black,   7, 'f'),
-        Pawn.new(:black,   7, 'g'),
-        Pawn.new(:black,   7, 'h'),
-        Rook.new(:black,   8, 'a'),
-        Knight.new(:black, 8, 'b'),
-        Bishop.new(:black, 8, 'c'),
-        Queen.new(:black,  8, 'd'),
-        King.new(:black,   8, 'e'),
-        Bishop.new(:black, 8, 'f'),
-        Knight.new(:black, 8, 'g'),
-        Rook.new(:black,   8, 'h')
+        Rook.new(:white,   'a', 1),
+        Knight.new(:white, 'b', 1),
+        Bishop.new(:white, 'c', 1),
+        Queen.new(:white,  'd', 1),
+        King.new(:white,   'e', 1),
+        Bishop.new(:white, 'f', 1),
+        Knight.new(:white, 'g', 1),
+        Rook.new(:white,   'h', 1),
+        Pawn.new(:white,   'a', 2),
+        Pawn.new(:white,   'b', 2),
+        Pawn.new(:white,   'c', 2),
+        Pawn.new(:white,   'd', 2),
+        Pawn.new(:white,   'e', 2),
+        Pawn.new(:white,   'f', 2),
+        Pawn.new(:white,   'g', 2),
+        Pawn.new(:white,   'h', 2),
+        Pawn.new(:black,   'a', 7),
+        Pawn.new(:black,   'b', 7),
+        Pawn.new(:black,   'c', 7),
+        Pawn.new(:black,   'd', 7),
+        Pawn.new(:black,   'e', 7),
+        Pawn.new(:black,   'f', 7),
+        Pawn.new(:black,   'g', 7),
+        Pawn.new(:black,   'h', 7),
+        Rook.new(:black,   'a', 8),
+        Knight.new(:black, 'b', 8),
+        Bishop.new(:black, 'c', 8),
+        Queen.new(:black,  'd', 8),
+        King.new(:black,   'e', 8),
+        Bishop.new(:black, 'f', 8),
+        Knight.new(:black, 'g', 8),
+        Rook.new(:black,   'h', 8)
       ]
     end
 
@@ -49,8 +49,8 @@ module Chess
       @pieces = pieces
     end
 
-    def at(rank, file)
-      @pieces.detect { |piece| piece.at?(rank, file) }
+    def at(file, rank)
+      @pieces.detect { |piece| piece.at?(file, rank) }
     end
 
     def render(...)
@@ -83,7 +83,7 @@ module Chess
             print "\e[48;2;200;168;129m"
           end
 
-          piece = @position.at(rank, file)
+          piece = @position.at(file, rank)
 
           if piece
             if piece.white?
@@ -122,10 +122,10 @@ module Chess
   class Piece
     attr_reader :rank, :file
 
-    def initialize(colour, rank, file)
+    def initialize(colour, file, rank)
       @white = colour == :white
-      @rank = rank
       @file = file
+      @rank = rank
     end
 
     def white?
@@ -136,8 +136,8 @@ module Chess
       !white?
     end
 
-    def at?(rank, file)
-      self.rank == rank && self.file == file
+    def at?(file, rank)
+      self.file == file && self.rank == rank
     end
 
     def moves
