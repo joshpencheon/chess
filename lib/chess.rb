@@ -151,37 +151,37 @@ module Chess
 
   class Pawn < Piece
     def icon
-      white? ? '♙' : '♟︎'
+      '♟︎'
     end
   end
 
   class Knight < Piece
     def icon
-      white? ? '♘' : '♞'
+      '♞'
     end
   end
 
   class Bishop < Piece
     def icon
-      white? ? '♗' : '♝'
+      '♝'
     end
   end
 
   class Rook < Piece
     def icon
-      white? ? '♖' : '♜'
+      '♜'
     end
   end
 
   class Queen < Piece
     def icon
-      white? ? '♕' : '♛'
+      '♛'
     end
   end
 
   class King < Piece
     def icon
-      white? ? '♔' : '♚'
+      '♚'
     end
   end
 end
