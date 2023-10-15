@@ -73,11 +73,11 @@ module Chess
       end
 
       puts ' ┌────────────────────────┐'
-      ranks.reverse_each do |rank|
+      ranks.reverse_each.with_index do |rank, rank_index|
         print "#{rank}│"
 
-        files.each_with_index do |file, index|
-          if (rank + index).odd?
+        files.each_with_index do |file, file_index|
+          if (rank_index + file_index).odd?
             print "\e[48;2;100;82;59m"
           else
             print "\e[48;2;200;168;129m"
