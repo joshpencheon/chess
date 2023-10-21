@@ -1,15 +1,42 @@
 # frozen_string_literal: true
 
+require "stringio"
+
 module Chess
   class Game
+    attr_reader :positions
+
     def initialize
       @positions = [Position.starting]
+    end
+
+    def to_move
+      current_position.to_move
+    end
+
+    def move
+      piece = current_position.pieces.sample
+      file = ('a'..'g').to_a.sample
+      rank = (1..8).to_a.sample
+      new_position = current_position.move(piece:, file:, rank:)
+      @positions << new_position
+      self
+    end
+
+    def render(...)
+      current_position.render(...)
+    end
+
+    private
+
+    def current_position
+      positions.last
     end
   end
 
   class Position
     def self.starting
-      new [
+      new(to_move: :white, pieces: [
         Rook.new(:white,   'a', 1),
         Knight.new(:white, 'b', 1),
         Bishop.new(:white, 'c', 1),
@@ -42,19 +69,54 @@ module Chess
         Bishop.new(:black, 'f', 8),
         Knight.new(:black, 'g', 8),
         Rook.new(:black,   'h', 8)
-      ]
+      ])
     end
 
-    def initialize(pieces)
+    attr_reader :pieces
+
+    def initialize(to_move:, pieces:)
+      @to_move = to_move
       @pieces = pieces
     end
 
-    def at(file, rank)
-      @pieces.detect { |piece| piece.at?(file, rank) }
+    def at(file:, rank:)
+      pieces.detect { |piece| piece.at?(file:, rank:) }
+    end
+
+    def move(piece:, file:, rank:)
+      other_pieces = (pieces - [piece]).map(&:dup)
+      next_position = self.class.new(to_move: other_player, pieces: other_pieces)
+
+      puts "moved from: #{piece}"
+      captured_piece = next_position.at(file:, rank:)
+      puts "captured: #{captured_piece}"
+      next_position.capture(piece: captured_piece) if captured_piece
+
+      moved_piece = piece.dup.move(file:, rank:)
+      puts "moved to: #{moved_piece}"
+      next_position.place(piece: moved_piece)
+
+      next_position
     end
 
     def render(...)
       Renderer.new(self).render(...)
+    end
+
+    protected
+
+    def capture(piece:)
+      pieces.delete(piece)
+    end
+
+    def place(piece:)
+      pieces << piece
+    end
+
+    private
+
+    def other_player
+      @to_move == :white ? :black : :white
     end
   end
 
@@ -67,45 +129,50 @@ module Chess
       ranks = white_ranks.to_a
       files = white_files.to_a
 
+      canvas = StringIO.new
+
       unless perspective == :white
         ranks.reverse!
         files.reverse!
       end
 
-      puts ' ┌────────────────────────┐'
+      canvas.puts ' ┌────────────────────────┐'
       ranks.reverse_each.with_index do |rank, rank_index|
-        print "#{rank}│"
+        canvas.print "#{rank}│"
 
         files.each_with_index do |file, file_index|
           if (rank_index + file_index).odd?
-            print "\e[48;2;100;82;59m"
+            canvas.print "\e[48;2;100;82;59m"
           else
-            print "\e[48;2;200;168;129m"
+            canvas.print "\e[48;2;200;168;129m"
           end
 
-          piece = @position.at(file, rank)
+          piece = @position.at(file:, rank:)
 
           if piece
             if piece.white?
-              print "\e[97m"
+              canvas.print "\e[97m"
             else
-              print "\e[30m"
+              canvas.print "\e[30m"
             end
 
-            print " #{piece.icon} "
+            canvas.print " #{piece.icon} "
           else
-            print '   '
+            canvas.print '   '
           end
 
-          print "\e[0m"
+          canvas.print "\e[0m"
         end
 
-        puts '│'
+        canvas.puts '│'
       end
-      puts ' └────────────────────────┘'
-      print '  '
-      files.each { |file| print " #{file} " }
-      puts
+      canvas.puts ' └────────────────────────┘'
+      canvas.print '  '
+      files.each { |file| canvas.print " #{file} " }
+      canvas.puts
+
+      canvas.rewind
+      puts canvas.read
     end
 
     private
@@ -136,8 +203,18 @@ module Chess
       !white?
     end
 
-    def at?(file, rank)
+    def move(file:, rank:)
+      @file = file
+      @rank = rank
+      self
+    end
+
+    def at?(file:, rank:)
       self.file == file && self.rank == rank
+    end
+
+    def to_s
+      "#{self.class.name} #{file}#{rank}"
     end
 
     def moves
