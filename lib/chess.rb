@@ -193,6 +193,7 @@ module Chess
       @white = colour == :white
       @file = file
       @rank = rank
+      @has_moved = false
     end
 
     def white?
@@ -204,9 +205,14 @@ module Chess
     end
 
     def move(file:, rank:)
+      @has_moved = true
       @file = file
       @rank = rank
       self
+    end
+
+    def has_moved?
+      @has_moved
     end
 
     def at?(file:, rank:)
