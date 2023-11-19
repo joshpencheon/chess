@@ -172,6 +172,7 @@ module Chess
       canvas.puts
 
       canvas.rewind
+      puts "\033[H\033[2J"
       puts canvas.read
     end
 
@@ -268,3 +269,5 @@ module Chess
     end
   end
 end
+
+Chess::Game.new.render
