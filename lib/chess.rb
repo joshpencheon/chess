@@ -27,6 +27,10 @@ module Chess
       current_position.render(...)
     end
 
+    def evaluation
+      current_position.evaluation
+    end
+
     private
 
     def current_position
@@ -72,7 +76,7 @@ module Chess
       ])
     end
 
-    attr_reader :pieces
+    attr_reader :pieces, :to_move
 
     def initialize(to_move:, pieces:)
       @to_move = to_move
@@ -106,7 +110,7 @@ module Chess
     def evaluation
       @evaluation = pieces
         .partition(&:white?)
-        .map { |ps| ps.sum(&:value) }
+        .map { |ps| ps.sum(&:weighted_value) }
         .reduce(:-)
     end
 
@@ -171,7 +175,16 @@ module Chess
           canvas.print "\e[0m"
         end
 
-        canvas.puts '│'
+        canvas.print '│'
+
+        case rank_index
+        when 2
+          canvas.print " next to move: #{@position.to_move}"
+        when 4
+          canvas.print "   evaluation: #{@position.evaluation}"
+        end
+
+        canvas.puts "\n"
       end
       canvas.puts ' └────────────────────────┘'
       canvas.print '  '
@@ -241,6 +254,27 @@ module Chess
 
     def value
       raise NoMethodError
+    end
+
+    def weighted_value
+      value * value_weighting
+    end
+
+    private
+
+    def value_weighting
+      weighting = 1.0
+      weighting -= 0.25 if outer_file?
+      weighting -= 0.25 if outer_rank?
+      weighting
+    end
+
+    def outer_file?
+      %w[a b g h].include?(file)
+    end
+
+    def outer_rank?
+      [1, 2, 7, 8].include?(file)
     end
   end
 
