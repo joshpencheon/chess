@@ -103,6 +103,13 @@ module Chess
       Renderer.new(self).render(...)
     end
 
+    def evaluation
+      @evaluation = pieces
+        .partition(&:white?)
+        .map { |ps| ps.sum(&:value) }
+        .reduce(:-)
+    end
+
     protected
 
     def capture(piece:)
@@ -231,42 +238,40 @@ module Chess
     def icon
       raise NoMethodError
     end
+
+    def value
+      raise NoMethodError
+    end
   end
 
   class Pawn < Piece
-    def icon
-      '♟︎'
-    end
+    def icon = '♟︎'
+    def value = 1
   end
 
   class Knight < Piece
-    def icon
-      '♞'
-    end
+    def icon = '♞'
+    def value = 3
   end
 
   class Bishop < Piece
-    def icon
-      '♝'
-    end
+    def icon = '♝'
+    def value = 3
   end
 
   class Rook < Piece
-    def icon
-      '♜'
-    end
+    def icon = '♜'
+    def value = 5
   end
 
   class Queen < Piece
-    def icon
-      '♛'
-    end
+    def icon = '♛'
+    def value = 9
   end
 
   class King < Piece
-    def icon
-      '♚'
-    end
+    def icon = '♚'
+    def value = 0 # The king is invaluable
   end
 end
 
